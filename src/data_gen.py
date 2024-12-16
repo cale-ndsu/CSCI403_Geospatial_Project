@@ -14,7 +14,8 @@ import random
 import math
 from enum import Enum
 
-TRAINING_DATA_FILE = '../data/geospatial_data.csv'
+base_path = os.path.dirname(os.path.abspath(__file__))  
+TRAINING_DATA_FILE = os.path.join(base_path, '../data/geospatial_data.csv')
 
 
 def training_data_file_exists():
@@ -22,13 +23,9 @@ def training_data_file_exists():
 
 
 def data_check():
-
     if training_data_file_exists() == False:
         file = open(TRAINING_DATA_FILE, 'x')
         file.close()
-        return False
-        
-    return True
 
 
 def generate_data(num_of_entries):
@@ -51,74 +48,71 @@ def generate_data(num_of_entries):
     if not (isinstance(num_of_entries, int)):
         raise Exception('Not of int type')
 
-    if data_check() == True:
+    data_check()
 
-        file = open(TRAINING_DATA_FILE, 'a')
+    file = open(TRAINING_DATA_FILE, 'w')
 
-        for entry in range(math.ceil(num_of_entries/2)):
-        # for IP addresses to be considered illegitimate
+    for entry in range(math.ceil(num_of_entries/2)):
+    # for IP addresses to be considered illegitimate
 
-            chances_1 = generate_random_reference(proxy_chances)
+        chances_1 = generate_random_reference(proxy_chances)
 
-            if secrets.choice(chances_1) == ('PROXY'):
-                
-                chances_2 = generate_random_reference(geo_data_proxy_chances)
-                selection = secrets.choice(chances_2)
+        if secrets.choice(chances_1) == ('PROXY'):
+            
+            chances_2 = generate_random_reference(geo_data_proxy_chances)
+            selection = secrets.choice(chances_2)
 
-                if selection  == ('INTL_PROXY'):
-                    file.write("1,0,0,0,1\n")
+            if selection  == ('INTL_PROXY'):
+                file.write("1,0,0,0,1\n")
 
-                if selection == ('NA_PROXY'):
-                    file.write("1,1,0,0,1\n")
+            if selection == ('NA_PROXY'):
+                file.write("1,1,0,0,1\n")
 
-                if selection == ('US_PROXY'):
-                    file.write("1,1,1,0,1\n")
+            if selection == ('US_PROXY'):
+                file.write("1,1,1,0,1\n")
 
-                if selection == ('ND_OR_MN_PROXY'):
-                    file.write("1,1,1,1,1\n")
-
-
-            else:
-
-                chances_2 = generate_random_reference(geo_data_not_proxy_chances)
-                selection = secrets.choice(chances_2)
-
-                if selection == ('INTL'):
-                    file.write("0,0,0,0,1\n")
-
-                if selection == ('NA'):
-                    file.write("0,1,0,0,1\n")
-
-                if selection == ('US'):
-                    file.write("0,1,1,0,1\n")
-
-                if selection == ('ND_OR_MN'):
-                    file.write("0,1,1,1,1\n")
+            if selection == ('ND_OR_MN_PROXY'):
+                file.write("1,1,1,1,1\n")
 
 
-        for entry in range(math.floor(num_of_entries/2)):
-        # for IP addresses to be considered legitimate
+        else:
 
-                chances = generate_random_reference(geo_data_legitimate_chances)
-                selection = secrets.choice(chances)
+            chances_2 = generate_random_reference(geo_data_not_proxy_chances)
+            selection = secrets.choice(chances_2)
 
-                if selection == ('INTL'):
-                    file.write("0,0,0,0,0\n")
+            if selection == ('INTL'):
+                file.write("0,0,0,0,1\n")
 
-                if selection == ('NA'):
-                    file.write("0,1,0,0,0\n")
+            if selection == ('NA'):
+                file.write("0,1,0,0,1\n")
 
-                if selection == ('US'):
-                    file.write("0,1,1,0,0\n")
+            if selection == ('US'):
+                file.write("0,1,1,0,1\n")
 
-                if selection == ('ND_OR_MN'):
-                    file.write("0,1,1,1,0\n")
+            if selection == ('ND_OR_MN'):
+                file.write("0,1,1,1,1\n")
 
 
-        file.close()
+    for entry in range(math.floor(num_of_entries/2)):
+    # for IP addresses to be considered legitimate
 
-    else:
-        raise Exception('Data file did not exist. Make sure file exists under data folder.')
+            chances = generate_random_reference(geo_data_legitimate_chances)
+            selection = secrets.choice(chances)
+
+            if selection == ('INTL'):
+                file.write("0,0,0,0,0\n")
+
+            if selection == ('NA'):
+                file.write("0,1,0,0,0\n")
+
+            if selection == ('US'):
+                file.write("0,1,1,0,0\n")
+
+            if selection == ('ND_OR_MN'):
+                file.write("0,1,1,1,0\n")
+
+
+    file.close()
 
 
 def generate_random_reference(Enum):

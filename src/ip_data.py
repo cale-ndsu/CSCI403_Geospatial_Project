@@ -25,11 +25,11 @@ class IP_Data:
 
 
     def __str__(self):
-        return('Is Proxy: ' + str(self.is_proxy) + ' \n'
-            +  'In North America: ' + str(self.in_NA) + ' \n'
-            +  'In United States: ' + str(self.in_US) + ' \n'
-            +  'In North Dakota or Minnesota: ' + str(self.in_ND_or_MN) + ' \n')
-
+        return('%20s\t%s\n%20s\t%s\n%20s\t%s\n%20s\t%s\n' \
+                % ('Is Proxy:',str(self.is_proxy), \
+                   'In North America:',str(self.in_NA), \
+                   'In United States:',str(self.in_US), \
+                   'In ND or MN:',str(self.in_ND_or_MN)))
     
     def set_proxy(boolean):
         if not (isinstance(boolean, bool)):
