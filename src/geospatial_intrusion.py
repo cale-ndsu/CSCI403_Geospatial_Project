@@ -8,6 +8,7 @@ parts to be run via CLI
 
 '''
 import os
+from ml_modeling import main_ml
 
 def main():
 
@@ -41,7 +42,7 @@ def main():
 
 
         if input_1 == 'b':
-            # exec ml_modeling.py
+            main_ml()
             pass
 
 
