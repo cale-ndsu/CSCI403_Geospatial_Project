@@ -17,13 +17,13 @@ import socket
 import ipaddress
 import time
 from ip_data import IP_Data
-from numpy import loadtxt
+import numpy
 import tensorflow
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))  
-# COMPILED_MODEL_PATH = os.path.join(BASE_PATH, '../data/.h5')
+COMPILED_MODEL_PATH = os.path.join(BASE_PATH, '../data/ml_model.h5')
 SAMPLE_DATA_PATH = os.path.join(BASE_PATH, '../data/sample_ip_addresses.txt')
 
 
@@ -36,6 +36,15 @@ def eval_main(an_input):
 
     if option == 1: # evaluate all IP addresses in a .txt file
 
+        model_path = os.path.join(BASE_PATH, '../data/ml_model.h5')
+        if not os.path.exists(model_path):
+            raise Exception(f'Model file not found at {model_path}. Train the model first.')
+
+        model = tensorflow.keras.models.load_model(model_path)
+        
+        # Recompile model with no metrics for inference
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=[])
+
         if not sample_ip_addresses_exist():
             raise Exception('Could not find data at ../data/sample_ip_addresses.txt')
 
@@ -43,23 +52,32 @@ def eval_main(an_input):
             lines = file.readlines()
             for ip in lines:
                 ip = ip.replace("\n","")
-                evaluate(ip)
+                evaluate(ip,model)
 
     elif option == 0: # evaluate an IP address from user input
         exit_flag = False
+
+        model_path = os.path.join(BASE_PATH, '../data/ml_model.h5')
+        if not os.path.exists(model_path):
+            raise Exception(f'Model file not found at {model_path}. Train the model first.')
+
+        model = tensorflow.keras.models.load_model(model_path)
+        
+        # Recompile model with no metrics for inference
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=[])
 
         while(exit_flag == False):
             ip_input = input("\nPlease enter a valid IP address: ")
 
             if valid_ipv4(ip_input) == True or valid_ipv6(ip_input) == True:
-                evaluate(ip_input)
+                evaluate(ip_input,model)
                 exit_flag = True
 
     else:
         return
 
-
-def evaluate(ip_address):
+# Pass in IP and model so that the model isnt compiled every loop
+def evaluate(ip_address,model):
 
     json = get_json(ip_address)
 
@@ -92,9 +110,17 @@ def evaluate(ip_address):
     print('\nEvaluating %s on machine learning model...\n' % (ip_address))
     time.sleep(3)
 
-    # load .h5 file and evaluate here...
+    # Prepare data for prediction
+    input_data = numpy.array(encoded_data[:4]).reshape(1, -1)  # Convert to 2D NumPy array for prediction
 
-    # ... then print out if IP should be blocked once predicted
+    # Make prediction
+    prediction = model.predict(input_data)[0][0]  # Get the predicted probability
+
+    # Interpret prediction
+    if prediction > 0.5:
+        print(f'\nPrediction: {ip_address} should be BLOCKED (malicious, confidence: {prediction:.2f})\n')
+    else:
+        print(f'\nPrediction: {ip_address} is SAFE (benign, confidence: {prediction:.2f})\n')
 
 
 def get_json(ip_address):
