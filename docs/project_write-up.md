@@ -106,7 +106,7 @@ For IP addresses local to North Dakota or Minnesota, they are predicted to be sa
   <img src="../img/safe_ip.png" /> </br>
 </p> </br></br>
 
-And, for IP addresses not local to the area, the addresses are marked a malicious with less certainty. </br>
+And, for IP addresses not local to the area, the addresses are marked as malicious with less certainty. </br>
 
 <p align="center">
   <img src="../img/foreign_ip.png" /> </br>
