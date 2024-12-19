@@ -118,9 +118,9 @@ def evaluate(ip_address,model):
 
     # Interpret prediction
     if prediction > 0.5:
-        print(f'\nPrediction: {ip_address} should be BLOCKED (malicious, confidence: {prediction:.2f})\n')
+        print(f'\nPrediction: {ip_address} should be BLOCKED ( P(Malicious) = {prediction:.2f})\n')
     else:
-        print(f'\nPrediction: {ip_address} is SAFE (benign, confidence: {prediction:.2f})\n')
+        print(f'\nPrediction: {ip_address} is SAFE ( P(Malicious) = {prediction:.2f})\n')
 
 
 def get_json(ip_address):
